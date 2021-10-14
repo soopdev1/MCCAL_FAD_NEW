@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <button type="button" class="btn btn-block blue uppercase" id="btnSave">Screen</button>
+        <!--<img src='' alt='' id='img' />-->
+
+        <script>
+            $("#btnSave").click(function () {
+                html2canvas($('.content')[0], {
+                    width: $('.content').width(),
+                    height: $('.content').height()
+                }).then(function (canvas) {
+                    var base64 = canvas.toDataURL("image/jpeg", 1);
+                    $.post("LoginOperations",
+                            {
+                                base64: base64,
+                                type: "screenshot"
+                            },
+                            function (data, status) {
+                                if (data !== null) {
+                                    saveAs(b64toBlob("data:application/pdf;base64," + data), "Screen_.pdf");
+                                } else {
+                                    alert("Data: " + data + "\nStatus: " + status);
+                                }
+                            });
+                });
+            });
+            function b64toBlob(dataURI) {
+                var byteString = atob(dataURI.split(',')[1]);
+                var ab = new ArrayBuffer(byteString.length);
+                var ia = new Uint8Array(ab);
+                for (var i = 0; i < byteString.length; i++) {
+                    ia[i] = byteString.charCodeAt(i);
+                }
+                return new Blob([ab], {type: 'application/pdf'});
+            }
+        </script>
+        <script src="assets/js/html2canvas.js"></script>
+        <script src="assets/js/FileSaver.js"></script>
+
+    </body>
+</html>

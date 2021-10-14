@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jboss-web>
+    <context-root>/Fad</context-root>
+    <virtual-host>fad.servizi.link</virtual-host>
+</jboss-web>
