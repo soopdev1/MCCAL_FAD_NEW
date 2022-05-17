@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
+import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -33,12 +34,13 @@ public class Database {
     public Connection c;
     public Logger log;
 
+    private static final ResourceBundle conf = ResourceBundle.getBundle("conf.conf");
+
     public Database(Logger l) {
 
-        String user = "admin";
-        String password = "Xray8888$$!";
-//        String host = "clustermicrocredito.cluster-c6m6yfqeypv3.eu-south-1.rds.amazonaws.com:3306/microcredito";//NORMALE
-        String host = "clustermicrocredito.cluster-c6m6yfqeypv3.eu-south-1.rds.amazonaws.com:3306/professioni";//PROFESSIONI
+        String user = conf.getString("db.user");
+        String password = conf.getString("db.pass");
+        String host = conf.getString("db.host") + ":3306/" + conf.getString("db.name");
 
         this.log = l;
         boolean mysql = true;
@@ -54,7 +56,6 @@ public class Database {
                 p.put("connectTimeout", "1000");
                 p.put("useUnicode", "true");
                 p.put("serverTimezone", "UTC");
-                //p.put("useJDBCCompliantTimezoneShift", "false");
                 this.c = DriverManager.getConnection("jdbc:mysql://" + host, p);
             } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | SQLException ex) {
                 ex.printStackTrace();
@@ -219,7 +220,7 @@ public class Database {
         }
         return out;
     }
-    
+
     public GenericUser getUser(String mail) {
         GenericUser out = null;
         try {
@@ -275,7 +276,7 @@ public class Database {
     public List<GenericUser> get_UserProg(String idpr, boolean mail) {
         List<GenericUser> list = new ArrayList<>();
         try {
-            
+
             String sql = "SELECT * FROM allievi WHERE idprogetti_formativi = '" + idpr + "' ";
             if (mail) {
                 sql += " AND email REGEXP '^[a-zA-Z0-9][a-zA-Z0-9._-]*[a-zA-Z0-9._-]@[a-zA-Z0-9][a-zA-Z0-9._-]*[a-zA-Z0-9]\\\\.[a-zA-Z]{2,63}$'";
@@ -310,7 +311,7 @@ public class Database {
             }
             sql += " ORDER BY cognome,nome";
             Statement st = this.c.createStatement();
-            
+
 //            System.out.println(sql);
             ResultSet rs = st.executeQuery(sql);
             while (rs.next()) {
@@ -602,8 +603,8 @@ public class Database {
             ResultSet rs = st.executeQuery(sql);
             if (rs.next()) {
                 out = new Fadroom(
-                        rs.getInt("idfad"), 
-                        rs.getString("datacreazione"), 
+                        rs.getInt("idfad"),
+                        rs.getString("datacreazione"),
                         rs.getString("nomestanza"),
                         rs.getString("stato"),
                         rs.getInt("iduser"),

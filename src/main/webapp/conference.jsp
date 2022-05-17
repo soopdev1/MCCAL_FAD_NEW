@@ -22,7 +22,7 @@
         <script src="js/jquery-3.4.1.js"></script>
         <script src="js/external_api.js"></script>
         <script src="js/lib-jitsi-meet.min.js"></script>
-I    </head>
+</head>
 
     <%
         String us_cod = Action.getSessionValue(session, "us_cod");
@@ -129,7 +129,7 @@ I    </head>
             api.addEventListener('readyToClose', function (OUT) {
                 log_ajax('L5', '<%=us_stanza%>', "USCITI TUTTI");
                 api.dispose();
-            });            
+            });
         }
 
         function logout() {
@@ -314,7 +314,7 @@ I    </head>
                                 </div>
                                 <%} else {%>
                                 <div class="px-3 py-5 bg-gradient-secondary text-white"><b><u>ATTENZIONE!</u></b> Impossibile inviare comunicazione ai docenti in quanto nessuno di essi ha un indirizzo email correttamente configurato. Contattare il supporto.</div>
-                                <%}%>
+                                            <%}%>
                                 <hr>
                                 <%if (!usr.isEmpty()) {%>
                                 <div class="form-group" >
@@ -340,9 +340,9 @@ I    </head>
                                 <div class="px-3 py-5 bg-gradient-secondary text-white"><b><u>ATTENZIONE!</u></b> Impossibile inviare 
                                     comunicazione agli allievi in quanto nessuno di essi ha un indirizzo email correttamente configurato. 
                                     Contattare il supporto.</div>
-                                <%}%>
+                                    <%}%>
                                 <script>
-                                    
+
                                     function checksend(selectopt) {
                                         var select = $("#" + selectopt).val();
                                         if (select === "---") {

@@ -20,14 +20,14 @@
         <!-- Custom styles for this template-->
         <link href="css/sb-admin-2.min.css" rel="stylesheet">
         <script src="js/jquery-3.4.1.js"></script>
-        <script src="js/external_api.js"></script>
-        <script src="js/lib-jitsi-meet.min.js"></script>
-
+        <script src="https://meet.jit.si/external_api.js"></script>
+        <script src="https://meet.jit.si/libs/lib-jitsi-meet.min.js"></script>
     </head>
 
     <%
         String us_role = Action.getSessionValue(session, "us_role");
-        String us_nome = Action.getSessionValue(session, "us_nome");
+        String us_nome = Action.getSessionValue(session, "us_nome").replaceAll("[^a-zA-Z0-9]", " ");
+        //String us_nome = "senza cr speciali";
         String us_cognome = Action.getSessionValue(session, "us_cognome");
         String us_stanza = Action.getSessionValue(session, "us_stanza");
         String id_stanza = Action.getSessionValue(session, "id_stanza");
@@ -38,118 +38,6 @@
 
 
     <script>
-
-        function login() {
-            log_ajax('L1', '<%=us_stanza%>', '<%=us_role%>' + ';' + '<%=us_nome%>');
-            document.getElementById('startbutton').click();
-        }
-
-        function start(roomname) {
-            var name = "<%=us_nome%>" + " " + "<%=us_cognome%>";
-            var domain = "<%=Action.getDomainFAD()%>";
-            $('#content-jitsi').html("");
-            var but1 = ['microphone', 'camera', 'fullscreen', 'hangup', 'chat', 'desktop'];
-            
-            var options = {
-                roomName: roomname,
-                noSSL: false,
-                enableWelcomePage: false,
-                parentNode: document.getElementById('content-jitsi'),
-                configOverwrite: {
-                    enableWelcomePage: false
-                },
-                interfaceConfigOverwrite: {
-                    TOOLBAR_BUTTONS: but1
-                }
-            };
-            var api = new JitsiMeetExternalAPI(domain, options);
-            api.executeCommand('displayName', name);
-
-            api.addEventListener('avatarChanged', function (OUT) {
-                if (OUT.id === 'local') {
-                    trace_ajax("AVATAR MODIFICATO/INGRESSO -> " + '<%=us_nome%>');
-                } else {
-                    trace_ajax("AVATAR MODIFICATO/INGRESSO -> " + OUT.id);
-                }
-            });
-            api.addEventListener('audioAvailabilityChanged', function (OUT) {
-                //trace_ajax("AUDIO MODIFICATO -> " + + OUT.available);
-            });
-            api.addEventListener('audioMuteStatusChanged', function (OUT) {
-                //trace_ajax("AUDIO MUTO -> " + + OUT.MUTED);
-            });
-            api.addEventListener('videoAvailabilityChanged', function (OUT) {
-                //trace_ajax("VIDEO MODIFICATO -> " +  + OUT.available);
-            });
-            api.addEventListener('videoMuteStatusChanged', function (OUT) {
-                //trace_ajax("VIDEO BLOCCATO -> " +  + OUT.MUTED);
-            });
-
-            api.addEventListener('videoConferenceJoined', function (OUT) {
-                log_ajax('IN', '<%=us_stanza%>', "UTENTE LOGGATO CON ID " + OUT.id + " -- " + OUT.displayName);
-                log_ajax('IN', '<%=us_stanza%>', "PARTECIPANTI -> " + api.getNumberOfParticipants());
-            });
-
-            api.addEventListener('videoConferenceLeft', function (OUT) {
-                log_ajax('L3', '<%=us_stanza%>', '<%=us_role%>' + ';' + '<%=us_nome%>');
-            });
-
-            api.addEventListener('dominantSpeakerChanged', function (OUT) {
-                //trace_ajax("ORATORE MODIFICATO -> " + OUT.id);
-            });
-
-            api.addEventListener('outgoingMessage', function (OUT) {
-                log_ajax('IN', '<%=us_stanza%>', "MESSAGGIO -> " + '<%=us_nome%> ' + OUT.message);
-            });
-
-            api.addEventListener('incomingMessage', function (OUT) {
-                log_ajax('IN', '<%=us_stanza%>', "MESSAGGIO -> " + OUT.from + " -- " + OUT.nick + " -- " + OUT.message);
-            });
-
-            api.addEventListener('displayNameChange', function (OUT) {
-                log_ajax('IN', '<%=us_stanza%>', "NOME CAMBIATO -> " + '<%=us_nome%> ' + OUT.id);
-            });
-            api.addEventListener('participantJoined', function (OUT) {
-                log_ajax('IN', '<%=us_stanza%>', "NUOVO PARTECIPANTE -> " + OUT.id + " -- " + OUT.displayName);
-            });
-            api.addEventListener('participantLeft', function (OUT) {
-                log_ajax('L4', '<%=us_stanza%>', "USCITA PARTECIPANTE -> " + OUT.id);
-            });
-            api.addEventListener('readyToClose', function (OUT) {
-                log_ajax('L5', '<%=us_stanza%>', "USCITI TUTTI");
-                api.dispose();
-            });
-            //const numberOfParticipants = api.getNumberOfParticipants();//
-            api.addEventListener('videoConferenceLeft', function (OUT) {
-                log_ajax('L3', '<%=us_stanza%>', '<%=us_role%>' + ';' + '<%=us_nome%>');
-            });
-            api.addEventListener('dominantSpeakerChanged', function (OUT) {
-                //trace_ajax("ORATORE MODIFICATO -> " + OUT.id);
-            });
-
-            api.addEventListener('outgoingMessage', function (OUT) {
-                log_ajax('IN', '<%=us_stanza%>', "MESSAGGIO -> " + '<%=us_nome%> ' + OUT.message);
-            });
-
-            api.addEventListener('incomingMessage', function (OUT) {
-                log_ajax('IN', '<%=us_stanza%>', "MESSAGGIO -> " + OUT.from + " -- " + OUT.nick + " -- " + OUT.message);
-            });
-
-            api.addEventListener('displayNameChange', function (OUT) {
-                log_ajax('IN', '<%=us_stanza%>', "NOME CAMBIATO -> " + '<%=us_nome%> ' + OUT.id);
-            });
-            api.addEventListener('participantJoined', function (OUT) {
-                log_ajax('IN', '<%=us_stanza%>', "NUOVO PARTECIPANTE -> " + OUT.id + " -- " + OUT.displayName);
-            });
-            api.addEventListener('participantLeft', function (OUT) {
-                log_ajax('L4', '<%=us_stanza%>', "USCITA PARTECIPANTE -> " + OUT.id);
-            });
-            api.addEventListener('readyToClose', function (OUT) {
-                log_ajax('L5', '<%=us_stanza%>', "USCITI TUTTI");
-                api.dispose();
-            });
-
-        }
 
         function log_ajax(type, room, action) {
             $.ajax({
@@ -172,7 +60,80 @@
             );
         }
 
+        function login() {
+            log_ajax('L1', '<%=us_stanza%>', '<%=us_role%>' + ';' + '<%=us_nome%>');
+            document.getElementById('startbutton').click();
+        }
+
+        function start(roomname) {
+            var name = "<%=us_nome%>" + " " + "<%=us_cognome%>";
+            
+            var domain = "<%=Action.getDomainFAD()%>";
+            $('#content-jitsi').html("");
+            var but1 = ['microphone', 'camera', 'fullscreen', 'hangup', 'chat'];
+            if ('<%=us_role%>' !== 'ALLIEVO') {
+                but1 = ['microphone', 'camera', 'fullscreen', 'hangup', 'chat', 'desktop', 'settings'];
+            }
+
+            var options = {
+                roomName: roomname,
+                noSSL: false,
+                enableWelcomePage: false,
+                parentNode: document.getElementById('content-jitsi'),
+                configOverwrite: {
+                    enableWelcomePage: false
+                },
+                interfaceConfigOverwrite: {
+                    TOOLBAR_BUTTONS: but1
+                }
+            };
+
+            var api = new JitsiMeetExternalAPI(domain, options);
+            api.executeCommand('displayName', name);
+
+            api.addEventListener('avatarChanged', function (OUT) {
+                if (OUT.id === 'local') {
+                    trace_ajax("AVATAR MODIFICATO/INGRESSO -> " + '<%=us_nome%>');
+                } else {
+                    trace_ajax("AVATAR MODIFICATO/INGRESSO -> " + OUT.id);
+                }
+            });
+
+
+            api.addEventListener('videoConferenceJoined', function (OUT) {
+                log_ajax('IN', '<%=us_stanza%>', "UTENTE LOGGATO CON ID " + OUT.id + " -- " + name);
+                log_ajax('IN', '<%=us_stanza%>', "PARTECIPANTI -> " + api.getNumberOfParticipants());
+            });
+
+            api.addEventListener('videoConferenceLeft', function (OUT) {
+                log_ajax('L3', '<%=us_stanza%>', '<%=us_role%>' + ';' + '<%=us_nome%>');
+            });
+
+            api.addEventListener('outgoingMessage', function (OUT) {
+                log_ajax('IN', '<%=us_stanza%>', "MESSAGGIO -> " + '<%=us_nome%> ' + OUT.message);
+            });
+
+            api.addEventListener('incomingMessage', function (OUT) {
+                log_ajax('IN', '<%=us_stanza%>', "MESSAGGIO -> " + OUT.from + " -- " + OUT.nick + " -- " + OUT.message);
+            });
+
+            api.addEventListener('displayNameChange', function (OUT) {
+                log_ajax('IN', '<%=us_stanza%>', "NOME CAMBIATO -> " + '<%=us_nome%> ' + OUT.id);
+            });
+            api.addEventListener('participantJoined', function (OUT) {
+                log_ajax('IN', '<%=us_stanza%>', "NUOVO PARTECIPANTE -> " + OUT.id + " -- " + OUT.displayName);
+            });
+            api.addEventListener('participantLeft', function (OUT) {
+                log_ajax('L4', '<%=us_stanza%>', "USCITA PARTECIPANTE -> " + OUT.id);
+            });
+            api.addEventListener('readyToClose', function (OUT) {
+                log_ajax('L5', '<%=us_stanza%>', "USCITI TUTTI");
+                api.dispose();
+            });
+        }
+
         function logout() {
+            log_ajax('L2', '<%=us_stanza%>', '<%=us_role%>');
             $.ajax({
                 type: "POST",
                 url: "Login?type=logout"
@@ -181,7 +142,7 @@
         }
 
         function loadingpage() {
-            log_ajax('L1', '<%=us_stanza%>', '<%=us_role%>' + ';' + '<%=us_nome%>');
+            log_ajax('L1', '<%=us_stanza%>', '<%=us_role%>');
             document.getElementById('startbutton').click();
             document.getElementById('sidebarToggle').click();
         }
@@ -376,7 +337,8 @@
                             </script>
                             <%} else {%>
                             <div class="px-3 py-5 bg-gradient-secondary text-white"><b><u>ATTENZIONE!</u></b> Impossibile inviare comunicazione ai docenti in quanto nessuno di essi ha un indirizzo email correttamente configurato. Contattare il supporto.</div>
-                            <%}}%>
+                                        <%}
+                                }%>
 
                         </div>
                     </div>

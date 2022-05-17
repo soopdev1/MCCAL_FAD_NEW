@@ -63,9 +63,8 @@ public class Login extends HttpServlet {
             if (view.equals("0")) {
                 String stanza = get_Stanza_conferenza_login(id, password, user);
                 if (stanza != null) {
-                    ///////////////////////////////////////////////////////////////////
                     HttpSession se = request.getSession();
-                    se.setAttribute("us_nome", user.toLowerCase());
+                    se.setAttribute("us_nome", user.toLowerCase().replaceAll("@", "_"));
                     se.setAttribute("us_stanza", StringUtils.deleteWhitespace(stanza));
                     se.setAttribute("id_stanza", id);
                     se.setAttribute("us_role", "USER");
@@ -76,7 +75,7 @@ public class Login extends HttpServlet {
             } else {
                 String stanza = get_Stanza_conferenza_login(id, password, null);
                 HttpSession se = request.getSession();
-                se.setAttribute("us_nome", user.toLowerCase());
+                se.setAttribute("us_nome", user.toLowerCase().replaceAll("@", "_"));
                 se.setAttribute("us_stanza", StringUtils.deleteWhitespace(stanza));
                 se.setAttribute("id_stanza", id);
                 se.setAttribute("us_role", "ADMIN");
@@ -118,7 +117,6 @@ public class Login extends HttpServlet {
     }
 
     protected void login_fad_mc_multi(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        Action.printRequest(request);
 
         HttpSession se = request.getSession();
 

@@ -70,9 +70,9 @@ import org.joda.time.format.DateTimeFormatter;
 public class Action {
 
     public static final boolean test = false;
-    
+
     public static final Logger log = createLog("MC_API");
-    
+
     public static final String pathTEMP = "/mnt/Microcredito/temp/";
     public static final String pathLOG = "/mnt/Microcredito/log/";
     public static final String pat_1 = "dd/MM/yyyy HH:mm:ss";
@@ -85,8 +85,6 @@ public class Action {
     public static final String pat_8 = "ddMMyyyyHHmmss";
     public static final String pat_9 = "yyMMddHHmmssSSS";
     public static final String pat_10 = "dd/MM/yyyy HH:mm";
-    
-    
 
     private static Logger createLog(String appname) {
         Logger logger = Logger.getLogger(appname);
@@ -209,7 +207,11 @@ public class Action {
         if (out == null) {
             out = "";
         } else {
-            out = out.trim().toUpperCase();
+            try {
+                out = out.trim().toUpperCase();
+            } catch (Exception e) {
+                out = "";
+            }
         }
         return out;
     }
@@ -620,9 +622,9 @@ public class Action {
     }
 
     public static void main(String[] args) {
-        
+
         Sms.sendSmsFAD("SIMONE", "COSCO", "3286137172");
-        
+
     }
 
 }
