@@ -5,60 +5,29 @@
  */
 package it.refill.engine;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import static it.refill.engine.Action.parseINT;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Enumeration;
-import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.logging.FileHandler;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import net.fortuna.ical4j.data.CalendarOutputter;
-import net.fortuna.ical4j.model.TimeZone;
-import net.fortuna.ical4j.model.TimeZoneRegistry;
-import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
-import net.fortuna.ical4j.model.component.VEvent;
-import net.fortuna.ical4j.model.component.VTimeZone;
-import net.fortuna.ical4j.model.property.CalScale;
-import net.fortuna.ical4j.model.property.ProdId;
-import net.fortuna.ical4j.model.property.Uid;
-import net.fortuna.ical4j.model.property.Version;
-import net.fortuna.ical4j.util.RandomUidGenerator;
-import net.fortuna.ical4j.util.UidGenerator;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
-import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -69,12 +38,15 @@ import org.joda.time.format.DateTimeFormatter;
  */
 public class Action {
 
+    public static final ResourceBundle conf = ResourceBundle.getBundle("conf.conf");
+
     public static final boolean test = false;
 
-    public static final Logger log = createLog("MC_API");
+    public static final Logger log = createLog("MC_APIFAD");
 
-    public static final String pathTEMP = "/mnt/Microcredito/temp/";
-    public static final String pathLOG = "/mnt/Microcredito/log/";
+    public static final String pathTEMP = conf.getString("path.temp");
+    public static final String pathLOG = conf.getString("path.log");
+    public static final String titlepro = conf.getString("titolo");
     public static final String pat_1 = "dd/MM/yyyy HH:mm:ss";
     public static final String pat_2 = "dd/MM/yyyy";
     public static final String pat_3 = "HHmmss";
@@ -103,14 +75,13 @@ public class Action {
             }
             FileHandler fh = new FileHandler(pathLog + File.separator + appname + "_" + ora + ".log", true);
             logger.addHandler(fh);
-        } catch (IOException | SecurityException ex) {
+        } catch (Exception ex) {
             logger.severe(ex.getMessage());
         }
         return logger;
     }
 
     public static String getDomainFAD() {
-//        return "fadmcar.servizi.link";
         return get_Path("linkfad_FL");
     }
 
@@ -135,7 +106,7 @@ public class Action {
             String paramName = parameterNames.nextElement();
             String[] paramValues = request.getParameterValues(paramName);
             for (String paramValue : paramValues) {
-                System.out.println("NORMAL FIELD - " + paramName + " : " + new String(paramValue.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8));
+                log.log(Level.INFO, "NORMAL FIELD - {0} : {1}", new Object[]{paramName, new String(paramValue.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8)});
             }
         }
         boolean isMultipart = ServletFileUpload.isMultipartContent(request);
@@ -150,24 +121,22 @@ public class Action {
                     if (item.isFormField()) {
                         String fieldName = item.getFieldName();
                         String value = new String(item.getString().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
-                        System.out.println("MULTIPART FIELD - " + fieldName + " : " + value);
+                        log.log(Level.INFO, "MULTIPART FIELD - {0} : {1}", new Object[]{fieldName, value});
                     } else {
                         String fieldName = item.getFieldName();
                         String fieldValue = item.getName();
-                        System.out.println("MULTIPART FILE - " + fieldName + " : " + fieldValue);
+                        log.log(Level.INFO, "MULTIPART FILE - {0} : {1}", new Object[]{fieldName, fieldValue});
                     }
                 }
-            } catch (FileUploadException ex) {
-                ex.printStackTrace();
+            } catch (Exception ex) {
+                log.severe(estraiEccezione(ex));
             }
         }
     }
 
     public static void redirect(HttpServletRequest request, HttpServletResponse response, String destination) throws ServletException, IOException {
 
-//        String domain = "https://fad.servizi.link/";
         String domain = StringUtils.replace(Action.get_Path("linkfad"), "Login", "");
-//        String domain = "";
 
         if (test) {
             domain = "";
@@ -460,159 +429,6 @@ public class Action {
         return uri;
     }
 
-    private static String sendSMS(String cell, String msg, String type) {
-        try {
-            String[] recipients = new String[]{"39" + cell};
-
-            String username = "yisucal.supporto@microcredito.gov.it";
-            String password = "Calabria2020$$";
-
-            // Invio SMS Classic con mittente personalizzato di tipo alfanumerico
-            String result = skebbyGatewaySendSMS(username, password, recipients, msg, type, null, "yisucal");
-            // Invio SMS Basic
-            // String result = skebbyGatewaySendSMS(username, password, recipients, msg, "send_sms_basic", null, null);
-            // Invio SMS Classic con mittente personalizzato di tipo numerico
-            // String result = skebbyGatewaySendSMS(username, password, recipients, "Hi Mike, how are you?", "send_sms_classic", "393471234567", null);
-            // Invio SMS Classic con notifica(report) con mittente personalizzato di tipo alfanumerico - Invio SMS Classic Plus
-            // String result = skebbyGatewaySendSMS(username, password, recipients, "Hi Mike, how are you?", "send_sms_classic_report", null, "John");
-            // Invio SMS Classic con notifica(report) con mittente personalizzato di tipo numerico - Invio SMS Classic Plus
-            // String result = skebbyGatewaySendSMS(username, password, recipients, "Hi Mike, how are you?", "send_sms_classic_report", "393471234567", null);
-            // ------------------------------------------------------------------
-            // Controlla la documentazione completa all'indirizzo http://www.skebby.it/business/index/send-docs/ 
-            // ------------------------------------------------------------------
-            // Per i possibili errori si veda http://www.skebby.it/business/index/send-docs/#errorCodesSection
-            // ATTENZIONE: in caso di errore Non si deve riprovare l'invio, trattandosi di errori bloccanti
-            // ------------------------------------------------------------------       
-            //System.out.println("result: " + result);
-            return result;
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            return "failed";
-        }
-    }
-
-    private static String skebbyGatewaySendSMS(String username, String password, String[] recipients, String text, String smsType, String senderNumber, String senderString) throws IOException {
-        return skebbyGatewaySendSMS(username, password, recipients, text, smsType, senderNumber, senderString, "ISO-8859-1");
-    }
-
-    private static String skebbyGatewaySendSMS(String username, String password, String[] recipients, String text, String smsType,
-            String senderNumber, String senderString, String charset) throws IOException {
-        if (!charset.equals("UTF-8") && !charset.equals("ISO-8859-1")) {
-            throw new IllegalArgumentException("Charset not supported.");
-        }
-        List<NameValuePair> formparams = new ArrayList<>();
-        formparams.add(new BasicNameValuePair("method", smsType));
-        formparams.add(new BasicNameValuePair("username", username));
-        formparams.add(new BasicNameValuePair("password", password));
-        if (null != senderNumber) {
-            formparams.add(new BasicNameValuePair("sender_number", senderNumber));
-        }
-        if (null != senderString) {
-            formparams.add(new BasicNameValuePair("sender_string", senderString));
-        }
-
-        for (String recipient : recipients) {
-            formparams.add(new BasicNameValuePair("recipients[]", recipient));
-        }
-        formparams.add(new BasicNameValuePair("text", text));
-        formparams.add(new BasicNameValuePair("charset", charset));
-        UrlEncodedFormEntity entity = new UrlEncodedFormEntity(formparams, charset);
-        String endpoint = "https://gateway.skebby.it/api/send/smseasy/advanced/http.php";
-        HttpPost post = new HttpPost(endpoint);
-        post.setEntity(entity);
-        HttpResponse response = HttpClientBuilder.create().build().execute(post);
-        HttpEntity resultEntity = response.getEntity();
-        if (null != resultEntity) {
-            return EntityUtils.toString(resultEntity);
-        }
-        return null;
-
-    }
-
-    private static String[] login(String username, String password, String BASEURL) throws IOException {
-        URL url = new URL(BASEURL + "/login?username=" + username + "&password=" + password);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-
-        conn.setRequestMethod("GET");
-
-        if (conn.getResponseCode() != 200) {
-            throw new RuntimeException("Failed : HTTP error code : "
-                    + conn.getResponseCode());
-        }
-        BufferedReader br
-                = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-        String response = "";
-        String output;
-        while ((output = br.readLine()) != null) {
-            response += output;
-        }
-        conn.disconnect();
-
-        String[] parts = response.split(";");
-        return parts;
-    }
-
-    private static boolean sendSMS(String[] authKeys, SendSMSRequest sendSMS, String BASEURL) throws IOException {
-        GsonBuilder builder = new GsonBuilder();
-        Gson gson = builder.create();
-
-        URL url = new URL(BASEURL + "/sms");
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-
-        // Sending an SMS requires authentication
-        conn.setRequestProperty("user_key", authKeys[0]);
-        conn.setRequestProperty("Session_key", authKeys[1]);
-
-        conn.setRequestMethod("POST");
-        conn.setRequestProperty("Accept", "application/json");
-        conn.setRequestProperty("Content-type", "application/json");
-        conn.setDoOutput(true);
-
-        String payload = gson.toJson(sendSMS);
-
-        OutputStream os = conn.getOutputStream();
-        os.write(payload.getBytes());
-        os.flush();
-
-        if (conn.getResponseCode() != 201) {
-            throw new RuntimeException("Failed : HTTP error code : "
-                    + conn.getResponseCode());
-        }
-
-        BufferedReader br
-                = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-
-        String response = "";
-        String output;
-        while ((output = br.readLine()) != null) {
-            response += output;
-        }
-        conn.disconnect();
-
-        SendSMSResponse responseObj = gson.fromJson(response, SendSMSResponse.class);
-
-        return responseObj.isValid();
-    }
-
-    public static boolean newSkebby(String cell, String msg) {
-        try {
-            String BASEURL = "https://api.skebby.it/API/v1.0/REST/";
-            String MESSAGE_HIGH_QUALITY = "TI";
-            String username = "yisucal.supporto@microcredito.gov.it";
-            String password = "Calabria2020$$";
-            String[] authKeys = login(username, password, BASEURL);
-            SendSMSRequest sendSMS = new SendSMSRequest();
-            sendSMS.setMessage(msg);
-            sendSMS.setMessageType(MESSAGE_HIGH_QUALITY);
-            sendSMS.addRecipient("+39" + cell);
-            sendSMS.setSender("yisucal");
-            return sendSMS(authKeys, sendSMS, BASEURL);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return false;
-    }
-
     public static int parseINT(String ing) {
         try {
             return Integer.parseInt(ing);
@@ -620,185 +436,15 @@ public class Action {
         }
         return 0;
     }
-
-    public static void main(String[] args) {
-
-        Sms.sendSmsFAD("SIMONE", "COSCO", "3286137172");
-
-    }
-
-}
-
-class SendSMSRequest {
-
-    /**
-     * The message body
-     */
-    private String message;
-
-    /**
-     * The message type
-     */
-    private String message_type = "GP";
-
-    /**
-     * Should the API return the remaining credits?
-     */
-    private boolean returnCredits = false;
-
-    /**
-     * The list of recipients
-     */
-    private List<String> recipient = new ArrayList<>();
-
-    /**
-     * The sender Alias (TPOA)
-     */
-    private String sender = null;
-
-    /**
-     * Postpone the SMS message sending to the specified date
-     */
-    private Date scheduled_delivery_time = null;
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public String getMessageType() {
-        return message_type;
-    }
-
-    public void setMessageType(String messageType) {
-        this.message_type = messageType;
-    }
-
-    public boolean isReturnCredits() {
-        return returnCredits;
-    }
-
-    public void setReturnCredits(boolean returnCredits) {
-        this.returnCredits = returnCredits;
-    }
-
-    public List<String> getRecipient() {
-        return recipient;
-    }
-
-    public String getSender() {
-        return sender;
-    }
-
-    public void setSender(String sender) {
-        this.sender = sender;
-    }
-
-    public Date getScheduledDeliveryTime() {
-        return scheduled_delivery_time;
-    }
-
-    public void setScheduledDeliveryTime(Date scheduled_delivery_time) {
-        this.scheduled_delivery_time = scheduled_delivery_time;
-    }
-
-    public void addRecipient(String recipient) {
-        this.recipient.add(recipient);
-    }
-}
-
-/**
- * This class represents the API Response. It is automatically created starting
- * from the JSON object returned by the server, using GSon
- */
-class SendSMSResponse {
-
-    private String result;
-    private String order_id;
-    private int total_sent;
-    private int remaining_credits;
-    private String internal_order_id;
-
-    public String getResult() {
-        return result;
-    }
-
-    public String getOrderId() {
-        return order_id;
-    }
-
-    public int getTotalSent() {
-        return total_sent;
-    }
-
-    public int getRemainingCredits() {
-        return remaining_credits;
-    }
-
-    public String getInternalOrderId() {
-        return internal_order_id;
-    }
-
-    public boolean isValid() {
-        return "OK".equals(result);
-    }
-
-    private static Calendar conversion(String date) {
+    
+    public static String estraiEccezione(Exception ec1) {
         try {
-            String data = date.split(" ")[0];
-            String anno = data.split("-")[0];
-            String mese = data.split("-")[1];
-            String giorno = data.split("-")[2];
-            String ora = date.split(" ")[1];
-            String ore = ora.split(":")[0];
-            String min = ora.split(":")[1];
-            Calendar d1 = new GregorianCalendar();
-            d1.set(Calendar.MONTH, parseINT(mese) - 1);
-            d1.set(Calendar.DAY_OF_MONTH, parseINT(giorno));
-            d1.set(Calendar.YEAR, parseINT(anno));
-            d1.set(Calendar.HOUR_OF_DAY, parseINT(ore));
-            d1.set(Calendar.MINUTE, parseINT(min));
-            d1.set(Calendar.SECOND, 0);
-            return d1;
+            String stack_nam = ec1.getStackTrace()[0].getMethodName();
+            String stack_msg = ExceptionUtils.getStackTrace(ec1);
+            return stack_nam + " - " + stack_msg;
         } catch (Exception e) {
         }
-        return null;
-    }
+        return ec1.getMessage();
 
-    public static File createEVENT(String datainizioMYSQL, String datafineMYSQL, String eventName) {
-        try {
-            File ics = new File("Event_MC.ics");
-            TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
-            TimeZone timezone = registry.getTimeZone("Europe/Rome");
-            VTimeZone tz = timezone.getVTimeZone();
-            Calendar startDate = conversion(datainizioMYSQL);
-            startDate.setTimeZone(timezone);
-            java.util.Calendar endDate = conversion(datafineMYSQL);
-            endDate.setTimeZone(timezone);
-            net.fortuna.ical4j.model.DateTime start = new net.fortuna.ical4j.model.DateTime(startDate.getTime());
-            net.fortuna.ical4j.model.DateTime end = new net.fortuna.ical4j.model.DateTime(endDate.getTime());
-            VEvent meeting = new VEvent(start, end, eventName);
-            meeting.getProperties().add(tz.getTimeZoneId());
-            UidGenerator ug = new RandomUidGenerator();
-            Uid uid = ug.generateUid();
-            meeting.getProperties().add(uid);
-            net.fortuna.ical4j.model.Calendar icsCalendar = new net.fortuna.ical4j.model.Calendar();
-            icsCalendar.getProperties().add(new ProdId("-//FL_EventsCalendar//iCal4j 2.0//IT"));
-            icsCalendar.getProperties().add(Version.VERSION_2_0);
-            icsCalendar.getProperties().add(CalScale.GREGORIAN);
-            icsCalendar.getComponents().add(meeting);
-            FileOutputStream fout = new FileOutputStream(ics);
-            CalendarOutputter outputter = new CalendarOutputter();
-            outputter.output(icsCalendar, fout);
-            fout.close();
-            return ics;
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return null;
     }
-
 }

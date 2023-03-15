@@ -43,7 +43,6 @@ public class MailConference extends HttpServlet {
             usr.forEach(user -> {
                 if (EmailValidator.getInstance().isValid(user)) {
                     fadmail_conference(id_stanza, user);
-                    System.out.println("MAIL A: " + user);
                     out.print("success");
                     out.flush();
                     out.close();
@@ -56,7 +55,6 @@ public class MailConference extends HttpServlet {
         } else {
             if (EmailValidator.getInstance().isValid(mailaddress)) {
                 fadmail_conference(id_stanza, mailaddress);
-                System.out.println("MAIL A: " + mailaddress);
                 out.print("success");
                 out.flush();
                 out.close();

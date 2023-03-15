@@ -7,12 +7,14 @@ package it.refill.servlet;
 
 import it.refill.engine.Action;
 import static it.refill.engine.Action.getRequestValue;
+import static it.refill.engine.Action.log;
 import static it.refill.engine.Action.pat_1;
 import it.refill.engine.GenericUser;
 import static it.refill.servlet.Mail.fadmail_docente;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.logging.Level;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -59,7 +61,7 @@ public class Mail_Docenti extends HttpServlet {
                     out.close();
                 } else {
                     fadmail_docente(nomeprogettoform, datainvito, docente.getCognome() + " " + docente.getNome(), azioneform, docente.getCodicefiscale(), id_progetto, maildest, st);
-                    System.out.println("MAIL DOCENTE A: " + maildest + " -- " + docente.getCognome() + " " + docente.getNome());
+                    log.log(Level.INFO, "MAIL DOCENTE A: {0} -- {1} {2}", new Object[]{maildest, docente.getCognome(), docente.getNome()});
                     out.print("success");
                     out.flush();
                     out.close();

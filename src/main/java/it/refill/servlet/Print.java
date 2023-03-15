@@ -87,9 +87,9 @@ public class Print extends HttpServlet {
     
     protected void screenshot(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String out = screen_to_pdf(getRequestValue(request, "base64"), getRequestValue(request, "nomeuser"), getRequestValue(request, "nomeop"));
-        PrintWriter pw = response.getWriter();
-        pw.print(out);
-        pw.close();
+        try (PrintWriter pw = response.getWriter()) {
+            pw.print(out);
+        }
 
     }
 

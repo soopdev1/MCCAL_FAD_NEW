@@ -57,7 +57,7 @@ public class Login extends HttpServlet {
             se.setAttribute("us_nome", "TESTING USER");
             se.setAttribute("us_stanza", "Testing page");
             se.setAttribute("us_role", "USER");
-            se.setAttribute("id_stanza", "8");
+            se.setAttribute("id_stanza", "1");
             redirect(request, response, "conference_all.jsp");
         } else {
             if (view.equals("0")) {
@@ -136,39 +136,45 @@ public class Login extends HttpServlet {
             } else if (alunni.contains(codfisc)) { //ALUNNI
                 redirect(request, response, "logerr.jsp");
             } else { //MC
-                if (view.equals("1")) {
-                    GenericUser user = getUserMC(codfisc);
-                    if (user != null) {
-                        se.setAttribute("us_pro", progetto);
-                        se.setAttribute("us_cod", user.getIdallievi());
-                        se.setAttribute("us_nome", capitalize(user.getNome().toLowerCase()));
-                        se.setAttribute("us_cognome", capitalize(user.getCognome().toLowerCase()));
-                        se.setAttribute("us_cf", user.getCodicefiscale().toUpperCase());
-                        se.setAttribute("us_stanza", roomname.toUpperCase());
-                        se.setAttribute("us_corso", "CORSO " + corso);
-                        se.setAttribute("us_role", "ADMINMC");
-                        response.sendRedirect("conference.jsp");
-                    } else {
-                        redirect(request, response, "logerr.jsp");
+                switch (view) {
+                    case "1": {
+                        GenericUser user = getUserMC(codfisc);
+                        if (user != null) {
+                            se.setAttribute("us_pro", progetto);
+                            se.setAttribute("us_cod", user.getIdallievi());
+                            se.setAttribute("us_nome", capitalize(user.getNome().toLowerCase()));
+                            se.setAttribute("us_cognome", capitalize(user.getCognome().toLowerCase()));
+                            se.setAttribute("us_cf", user.getCodicefiscale().toUpperCase());
+                            se.setAttribute("us_stanza", roomname.toUpperCase());
+                            se.setAttribute("us_corso", "CORSO " + corso);
+                            se.setAttribute("us_role", "ADMINMC");
+                            response.sendRedirect("conference.jsp");
+                        } else {
+                            redirect(request, response, "logerr.jsp");
+                        }
+                        break;
                     }
-
-                } else if (view.equals("2")) { //SA
-                    GenericUser user = getUserSA(codfisc);
-                    if (user != null) {
-                        se.setAttribute("us_pro", progetto);
-                        se.setAttribute("us_cod", user.getIdallievi());
-                        se.setAttribute("us_nome", capitalize(user.getNome().toLowerCase()));
-                        se.setAttribute("us_cognome", capitalize(user.getCognome().toLowerCase()));
-                        se.setAttribute("us_cf", user.getCodicefiscale().toUpperCase());
-                        se.setAttribute("us_stanza", roomname.toUpperCase());
-                        se.setAttribute("us_corso", "CORSO " + corso);
-                        se.setAttribute("us_role", "SOGGETTO ATTUATORE");
-                        response.sendRedirect("conference.jsp");
-                    } else {
-                        redirect(request, response, "logerr.jsp");
+                    case "2": {
+                        //SA
+                        GenericUser user = getUserSA(codfisc);
+                        if (user != null) {
+                            se.setAttribute("us_pro", progetto);
+                            se.setAttribute("us_cod", user.getIdallievi());
+                            se.setAttribute("us_nome", capitalize(user.getNome().toLowerCase()));
+                            se.setAttribute("us_cognome", capitalize(user.getCognome().toLowerCase()));
+                            se.setAttribute("us_cf", user.getCodicefiscale().toUpperCase());
+                            se.setAttribute("us_stanza", roomname.toUpperCase());
+                            se.setAttribute("us_corso", "CORSO " + corso);
+                            se.setAttribute("us_role", "SOGGETTO ATTUATORE");
+                            response.sendRedirect("conference.jsp");
+                        } else {
+                            redirect(request, response, "logerr.jsp");
+                        }
+                        break;
                     }
-                } else {
-                    redirect(request, response, "logerr.jsp");
+                    default:
+                        redirect(request, response, "logerr.jsp");
+                        break;
                 }
             }
         } else {
@@ -215,7 +221,7 @@ public class Login extends HttpServlet {
                     se.setAttribute("us_cf", user.getCodicefiscale().toUpperCase());
                     se.setAttribute("us_stanza", stanza.toUpperCase());
                     se.setAttribute("us_role", "ALLIEVO");
-                    log_ajax("L1", stanza.toUpperCase(), "ALLIEVO:"+user.getIdallievi(), getNanoSecond());
+                    log_ajax("L1", stanza.toUpperCase(), "ALLIEVO:" + user.getIdallievi(), getNanoSecond());
                     redirect(request, response, "conference.jsp");
                 } else {
                     redirect(request, response, "logerr.jsp");
@@ -252,7 +258,7 @@ public class Login extends HttpServlet {
                         se.setAttribute("us_cf", user.getCodicefiscale().toUpperCase());
                         se.setAttribute("us_stanza", stanza.toUpperCase());
                         se.setAttribute("us_role", "ALLIEVO");
-                        log_ajax("L1", stanza.toUpperCase(), "ALLIEVO:"+user.getIdallievi(), getNanoSecond());
+                        log_ajax("L1", stanza.toUpperCase(), "ALLIEVO:" + user.getIdallievi(), getNanoSecond());
                         redirect(request, response, "conference.jsp");
                     } else {
                         redirect(request, response, "logerr.jsp");
@@ -302,12 +308,6 @@ public class Login extends HttpServlet {
         } else {
             CAD room = Action.getroom(parseINT(id));
             if (room != null && room.getStato().equals("0")) {
-                System.out.println("it.refill.servlet.Login.login_cad(1) " + room.getEmail());
-                System.out.println("it.refill.servlet.Login.login_cad(1) " + user);
-
-                System.out.println("it.refill.servlet.Login.login_cad(2) " + room.getPassword());
-                System.out.println("it.refill.servlet.Login.login_cad(2) " + password);
-
                 if (view.equals("0")) {
                     if (room.getEmail().toLowerCase().equals(user) && room.getPassword().equals(password)) {
                         ///////////////////////////////////////////////////////////////////
@@ -359,7 +359,7 @@ public class Login extends HttpServlet {
                     se.setAttribute("us_cf", user.getCodicefiscale().toUpperCase());
                     se.setAttribute("us_stanza", stanza.toUpperCase());
                     se.setAttribute("us_role", "ALLIEVO");
-                    log_ajax("L1", stanza.toUpperCase(), "ALLIEVO:"+user.getIdallievi(), getNanoSecond());
+                    log_ajax("L1", stanza.toUpperCase(), "ALLIEVO:" + user.getIdallievi(), getNanoSecond());
                     redirect(request, response, "conference.jsp");
                 } else {
                     redirect(request, response, "login.jsp?error=1");

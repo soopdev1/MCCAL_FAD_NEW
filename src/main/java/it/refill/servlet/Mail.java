@@ -7,6 +7,7 @@ package it.refill.servlet;
 
 import com.google.common.io.Files;
 import it.refill.engine.Action;
+import static it.refill.engine.Action.estraiEccezione;
 import static it.refill.engine.Action.formatStringtoStringDate;
 //import static it.refill.engine.Action.azioneform;
 import static it.refill.engine.Action.getRequestValue;
@@ -15,18 +16,20 @@ import static it.refill.engine.Action.pat_1;
 import static it.refill.engine.Action.pat_10;
 import static it.refill.engine.Action.pat_5;
 import static it.refill.engine.Action.pathTEMP;
+import static it.refill.engine.Action.titlepro;
 import it.refill.engine.Database;
 import it.refill.engine.Fadroom;
 import it.refill.engine.GenericUser;
+import static it.refill.engine.SMS_MJ.sendSmsFAD;
 import it.refill.engine.SendMailJet;
 import static it.refill.engine.SendMailJet.createEVENT;
 import static it.refill.engine.SendMailJet.sendMailEvento;
-import it.refill.engine.Sms;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.logging.Level;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -64,13 +67,13 @@ public class Mail extends HttpServlet {
         String azioneform = Action.get_Path("linkfad");
         String datainvito = new DateTime().toString(pat_1);
 
-        if (usr.size() > 0) {
+        if (!usr.isEmpty()) {
             if (cf.equals("---")) {
                 usr.forEach(user -> {
                     if (EmailValidator.getInstance().isValid(user.getEmail())) {
                         fadmail(nomeprogettoform, datainvito, user.getCognome() + " " + user.getNome(), azioneform, user.getCodicefiscale(), pr, user.getEmail(), st);
-                        Sms.sendSmsFAD(user.getNome(), user.getCognome(), user.getNumero());
-                        System.out.println("MAIL A: " + user.getEmail() + " -- " + user.getCognome() + " " + user.getNome());
+                        sendSmsFAD(user.getNome(), user.getCognome(), user.getNumero());
+                        log.log(Level.INFO, "MAIL A: {0} -- {1} {2}", new Object[]{user.getEmail(), user.getCognome(), user.getNome()});
                         out.print("success");
                         out.flush();
                         out.close();
@@ -86,8 +89,8 @@ public class Mail extends HttpServlet {
                     if (user != null) {
                         if (EmailValidator.getInstance().isValid(user.getEmail())) {
                             fadmail(nomeprogettoform, datainvito, user.getCognome() + " " + user.getNome(), azioneform, user.getCodicefiscale(), pr, user.getEmail(), st);
-                            Sms.sendSmsFAD(user.getNome(), user.getCognome(), user.getNumero());
-                            System.out.println("MAIL SINGOLA A: " + user.getEmail() + " -- " + user.getCognome() + " " + user.getNome());
+                            sendSmsFAD(user.getNome(), user.getCognome(), user.getNumero());
+                            log.log(Level.INFO, "MAIL SINGOLA A: {0} -- {1} {2}", new Object[]{user.getEmail(), user.getCognome(), user.getNome()});
                             out.print("success");
                             out.flush();
                             out.close();
@@ -117,10 +120,10 @@ public class Mail extends HttpServlet {
                 content = StringUtils.replace(content, "@azioneform", azioneform);
                 content = StringUtils.replace(content, "@codfiscuser", codfiscuser);
                 content = StringUtils.replace(content, "@proguser", proguser + "&roomname=" + stanza);
-                SendMailJet.sendMail("Microcredito", new String[]{maildest}, content, "FAD - Promemoria");
+                SendMailJet.sendMail(titlepro, new String[]{maildest}, content, "FAD - Promemoria");
                 temp.delete();
             } catch (Exception ex) {
-                ex.printStackTrace();
+                log.severe(estraiEccezione(ex));
             }
         }
     }
@@ -141,32 +144,15 @@ public class Mail extends HttpServlet {
                 content = StringUtils.replace(content, "@azioneform", azioneform);
                 content = StringUtils.replace(content, "@codfiscuser", codfiscuser);
                 content = StringUtils.replace(content, "@proguser", proguser + "&roomname=" + stanza);
-                SendMailJet.sendMail("Microcredito", new String[]{maildest}, content, "FAD - Promemoria");
-
-                System.out.println("it.refill.servlet.Mail.fadmail() " + temp.getPath());
-
-//                temp.delete();
+                SendMailJet.sendMail(titlepro, new String[]{maildest}, content, "FAD - Promemoria");
+                temp.delete();
                 return true;
             } catch (Exception ex) {
-                ex.printStackTrace();
+                log.severe(estraiEccezione(ex));
             }
         }
         return false;
     }
-
-//    public static void main(String[] args) {
-//        try {
-//            String mail = Action.get_Path("fadmail");
-//            new File(pathTEMP).mkdirs();
-//            File temp = new File(pathTEMP + Action.generaId(75) + "_temp.html");
-//
-//            FileUtils.writeByteArrayToFile(temp, Base64.decodeBase64(mail));
-//            System.out.println(temp.getPath());
-//
-//        } catch (IOException ex) {
-//            ex.printStackTrace();
-//        }
-//    }
 
     public static void fadmail_conference(String idfad, String maildest) {
         String[] mail = Action.get_Mail("conferenza");
@@ -175,17 +161,6 @@ public class Mail extends HttpServlet {
                 Fadroom fa = Action.getroom(idfad);
                 if (fa != null) {
                     Database db = new Database(log);
-//                    
-//
-//                    String content = mail[1];
-//                    content = StringUtils.replace(content, "@redirect", db.get_Path("domino") + "redirect_out.jsp");
-//                    content = StringUtils.replace(content, "@link", db.get_Path("linkfad"));
-//                    content = StringUtils.replace(content, "@id", idfad);
-//                    content = StringUtils.replace(content, "@user", maildest);
-//                    content = StringUtils.replace(content, "@pwd", fa.getPassword());
-//                    content = StringUtils.replace(content, "@email_tec", db.get_Path("emailtecnico"));
-//                    content = StringUtils.replace(content, "@email_am", db.get_Path("emailamministrativo"));
-
                     String content = mail[1].replace("@redirect", db.get_Path("domino") + "redirect_out.jsp")
                             .replace("@link", db.get_Path("linkfad"))
                             .replace("@id", idfad)
@@ -199,41 +174,17 @@ public class Mail extends HttpServlet {
 
                     db.closeDB();
 
-                    sendMailEvento("Microcredito", new String[]{maildest},
+                    sendMailEvento(titlepro, new String[]{maildest},
                             content,
                             mail[0],
                             createEVENT(fa.getInizio(), fa.getFine(), mail[0]));
                 }
             } catch (Exception ex) {
-                ex.printStackTrace();
+                log.severe(estraiEccezione(ex));
             }
         }
     }
 
-//    public static void main(String[] args) {
-//        String mail = Action.get_Path("fadmail");
-//        if (mail != null) {
-//            try {
-//                String pathtemp = "/mnt/temp/";
-//                new File(pathtemp).mkdirs();
-//                File temp = new File(pathtemp + Action.generaId(75) + "_temp.html");
-//                FileUtils.writeByteArrayToFile(temp, Base64.decodeBase64(mail));
-//                String content = Files.asCharSource(temp, StandardCharsets.UTF_8).read();
-//                content = StringUtils.replace(content, "@nomeprogettoform", "");
-//                content = StringUtils.replace(content, "@datainvito", "");
-//                content = StringUtils.replace(content, "@nomecognome", "");
-//                content = StringUtils.replace(content, "@azioneform", azioneform);
-//                content = StringUtils.replace(content, "@codfiscuser", "");
-//                content = StringUtils.replace(content, "@proguser", "3" + "&roomname=" + "3");
-//                SendMailJet.sendMail("Microcredito", new String[]{"rcosco@setacom.it"}, content, "FAD - Promemoria");
-//                temp.delete();
-////            } catch (IOException ex) {
-//            } catch (MailjetException | MailjetSocketTimeoutException | IOException ex) {
-//                ex.printStackTrace();
-//            }
-//        }
-//    }
-//    
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
