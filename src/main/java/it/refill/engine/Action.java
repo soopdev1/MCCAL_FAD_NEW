@@ -40,7 +40,7 @@ public class Action {
 
     public static final ResourceBundle conf = ResourceBundle.getBundle("conf.conf");
 
-    public static final boolean test = false;
+    public static final boolean test = true;
 
     public static final Logger log = createLog("MC_APIFAD");
 
