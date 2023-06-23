@@ -57,7 +57,7 @@ public class Database {
                 p.put("useUnicode", "true");
                 p.put("serverTimezone", "UTC");
                 this.c = DriverManager.getConnection("jdbc:mysql://" + host, p);
-            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | SQLException ex) {
+            } catch (Exception ex) {
                 ex.printStackTrace();
                 String methodName = new Object() {
                 }.getClass().getEnclosingMethod().getName();

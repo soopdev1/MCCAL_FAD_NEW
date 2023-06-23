@@ -24,26 +24,11 @@ import static com.mailjet.client.resource.Emailv31.Message.HTMLPART;
 import static com.mailjet.client.resource.Emailv31.Message.SUBJECT;
 import static com.mailjet.client.resource.Emailv31.Message.TO;
 import static com.mailjet.client.resource.Emailv31.resource;
+import static it.refill.servlet.Mail.fadmail_docente;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.UUID;
-import net.fortuna.ical4j.data.CalendarOutputter;
-import net.fortuna.ical4j.model.DateTime;
-import net.fortuna.ical4j.model.TimeZone;
-import net.fortuna.ical4j.model.TimeZoneRegistry;
-import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
-import net.fortuna.ical4j.model.component.VEvent;
-import net.fortuna.ical4j.model.component.VTimeZone;
-import net.fortuna.ical4j.model.property.CalScale;
-import net.fortuna.ical4j.model.property.ProdId;
-import net.fortuna.ical4j.model.property.Uid;
-import net.fortuna.ical4j.model.property.Version;
-import net.fortuna.ical4j.util.RandomUidGenerator;
-import net.fortuna.ical4j.util.UidGenerator;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
@@ -67,12 +52,10 @@ public class SendMailJet {
         return sendMail(name, to, null, txt, subject, null);
     }
 
-    
-
     public static boolean sendMail(String name, String[] to, String[] bcc, String txt, String subject) throws MailjetException {
         return sendMail(name, to, bcc, txt, subject, null);
     }
-    
+
     public static boolean sendMailEvento(String name, String[] to, String txt, String subject, AttachMJ evento) throws MailjetException {
         return sendMail(name, to, null, txt, subject, evento);
     }
@@ -85,7 +68,7 @@ public class SendMailJet {
 
         String mailjet_api = Action.get_Path("mailjet_api");
         String mailjet_secret = Action.get_Path("mailjet_secret");
-        String mailjet_name = "microcredito.noreply@faultless.it";
+        String mailjet_name = Action.get_Path("mailjet_name");
 
         ClientOptions options = ClientOptions.builder()
                 .apiKey(mailjet_api)
@@ -110,7 +93,9 @@ public class SendMailJet {
                         .put("Name", ""));
             }
         }
-
+//        System.out.println("it.refill.engine.SendMailJet.sendMail() "+mailjet_name);
+//        System.out.println("it.refill.engine.SendMailJet.sendMail() "+mailjet_api);
+//        System.out.println("it.refill.engine.SendMailJet.sendMail() "+mailjet_secret);
         JSONObject mail = new JSONObject().put(FROM, new JSONObject()
                 .put("Email", mailjet_name)
                 .put("Name", name))
@@ -294,7 +279,6 @@ public class SendMailJet {
 //        }
 //        return null;
 //    }
-    
     public static AttachMJ createEVENT(String datainizioMYSQL, String datafineMYSQL, String eventName) {
         try {
             org.joda.time.DateTime now = new org.joda.time.DateTime();
@@ -316,8 +300,7 @@ public class SendMailJet {
             new File(pathtemp).mkdirs();
             File ics = new File(pathtemp + uuid + ".ics");
 
-            try (FileWriter fw = new FileWriter(ics);
-                    BufferedWriter bw = new BufferedWriter(fw)) {
+            try ( FileWriter fw = new FileWriter(ics);  BufferedWriter bw = new BufferedWriter(fw)) {
                 bw.write(r1);
                 bw.newLine();
                 bw.write(r2);
@@ -357,4 +340,5 @@ public class SendMailJet {
         }
         return null;
     }
+
 }
