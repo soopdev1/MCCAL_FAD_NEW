@@ -3,25 +3,25 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package it.refill.servlet;
+package rc.so.servlet;
 
-import it.refill.engine.Action;
-import static it.refill.engine.Action.cf_list_alunni;
-import static it.refill.engine.Action.cf_list_docenti;
-import static it.refill.engine.Action.getAllievo;
-import static it.refill.engine.Action.getDocente;
-import static it.refill.engine.Action.getNanoSecond;
-import static it.refill.engine.Action.getRequestValue;
-import static it.refill.engine.Action.getUserMC;
-import static it.refill.engine.Action.getUserSA;
-import static it.refill.engine.Action.get_Stanza;
-import static it.refill.engine.Action.get_Stanza_conferenza_login;
-import static it.refill.engine.Action.insertTR;
-import static it.refill.engine.Action.log_ajax;
-import static it.refill.engine.Action.parseINT;
-import static it.refill.engine.Action.redirect;
-import it.refill.engine.CAD;
-import it.refill.engine.GenericUser;
+import rc.so.engine.Action;
+import static rc.so.engine.Action.cf_list_alunni;
+import static rc.so.engine.Action.cf_list_docenti;
+import static rc.so.engine.Action.getAllievo;
+import static rc.so.engine.Action.getDocente;
+import static rc.so.engine.Action.getNanoSecond;
+import static rc.so.engine.Action.getRequestValue;
+import static rc.so.engine.Action.getUserMC;
+import static rc.so.engine.Action.getUserSA;
+import static rc.so.engine.Action.get_Stanza;
+import static rc.so.engine.Action.get_Stanza_conferenza_login;
+import static rc.so.engine.Action.insertTR;
+import static rc.so.engine.Action.log_ajax;
+import static rc.so.engine.Action.parseINT;
+import static rc.so.engine.Action.redirect;
+import rc.so.engine.CAD;
+import rc.so.engine.GenericUser;
 import java.io.IOException;
 import java.util.List;
 import javax.servlet.ServletException;

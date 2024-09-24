@@ -3,11 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package it.refill.servlet;
+package rc.so.servlet;
 
-import static it.refill.engine.Action.getNanoSecond;
-import static it.refill.engine.Action.getRequestValue;
-import static it.refill.engine.Action.log_ajax;
+import static rc.so.engine.Action.getNanoSecond;
+import static rc.so.engine.Action.getRequestValue;
+import static rc.so.engine.Action.log_ajax;
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;

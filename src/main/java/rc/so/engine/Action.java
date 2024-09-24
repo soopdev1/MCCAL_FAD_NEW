@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package it.refill.engine;
+package rc.so.engine;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,7 +42,7 @@ public class Action {
 
     public static final boolean test = true;
 
-    public static final Logger log = createLog("MC_APIFAD");
+    public static final Logger log = createLog(conf.getString("name.app"));
 
     public static final String pathTEMP = conf.getString("path.temp");
     public static final String pathLOG = conf.getString("path.log");

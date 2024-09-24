@@ -1,6 +1,6 @@
 <%@page import="java.util.List"%>
-<%@page import="it.refill.engine.GenericUser"%>
-<%@page import="it.refill.engine.Action"%>
+<%@page import="rc.so.engine.GenericUser"%>
+<%@page import="rc.so.engine.Action"%>
 <!DOCTYPE html>
 <html lang="en">
 

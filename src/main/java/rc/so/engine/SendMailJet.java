@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package it.refill.engine;
+package rc.so.engine;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -25,8 +25,8 @@ import static com.mailjet.client.resource.Emailv31.Message.HTMLPART;
 import static com.mailjet.client.resource.Emailv31.Message.SUBJECT;
 import static com.mailjet.client.resource.Emailv31.Message.TO;
 import static com.mailjet.client.resource.Emailv31.resource;
-import static it.refill.engine.Action.conf;
-import static it.refill.engine.Action.log;
+import static rc.so.engine.Action.conf;
+import static rc.so.engine.Action.log;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;

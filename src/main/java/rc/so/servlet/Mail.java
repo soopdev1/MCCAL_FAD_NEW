@@ -3,27 +3,25 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package it.refill.servlet;
+package rc.so.servlet;
 
 import com.google.common.io.Files;
-import it.refill.engine.Action;
-import static it.refill.engine.Action.estraiEccezione;
-import static it.refill.engine.Action.formatStringtoStringDate;
-//import static it.refill.engine.Action.azioneform;
-import static it.refill.engine.Action.getRequestValue;
-import static it.refill.engine.Action.log;
-import static it.refill.engine.Action.pat_1;
-import static it.refill.engine.Action.pat_10;
-import static it.refill.engine.Action.pat_5;
-import static it.refill.engine.Action.pathTEMP;
-import static it.refill.engine.Action.titlepro;
-import it.refill.engine.Database;
-import it.refill.engine.Fadroom;
-import it.refill.engine.GenericUser;
-import static it.refill.engine.SMS_MJ.sendSmsFAD;
-import it.refill.engine.SendMailJet;
-import static it.refill.engine.SendMailJet.createEVENT;
-import static it.refill.engine.SendMailJet.sendMailEvento;
+import rc.so.engine.Action;
+import static rc.so.engine.Action.estraiEccezione;
+import static rc.so.engine.Action.formatStringtoStringDate;
+import static rc.so.engine.Action.getRequestValue;
+import static rc.so.engine.Action.log;
+import static rc.so.engine.Action.pat_1;
+import static rc.so.engine.Action.pat_10;
+import static rc.so.engine.Action.pat_5;
+import static rc.so.engine.Action.pathTEMP;
+import static rc.so.engine.Action.titlepro;
+import rc.so.engine.Database;
+import rc.so.engine.Fadroom;
+import rc.so.engine.GenericUser;
+import rc.so.engine.SendMailJet;
+import static rc.so.engine.SendMailJet.createEVENT;
+import static rc.so.engine.SendMailJet.sendMailEvento;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -39,6 +37,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.joda.time.DateTime;
+import static rc.so.engine.SMS_SINCH.sendSmsFAD;
 
 /**
  *
@@ -89,7 +88,7 @@ public class Mail extends HttpServlet {
                     if (user != null) {
                         if (EmailValidator.getInstance().isValid(user.getEmail())) {
                             fadmail(nomeprogettoform, datainvito, user.getCognome() + " " + user.getNome(), azioneform, user.getCodicefiscale(), pr, user.getEmail(), st);
-                            sendSmsFAD(user.getNome(), user.getCognome(), user.getNumero());
+//                            sendSmsFAD(user.getNome(), user.getCognome(), user.getNumero());
                             log.log(Level.INFO, "MAIL SINGOLA A: {0} -- {1} {2}", new Object[]{user.getEmail(), user.getCognome(), user.getNome()});
                             out.print("success");
                             out.flush();

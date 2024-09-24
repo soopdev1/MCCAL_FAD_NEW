@@ -3,23 +3,23 @@
     <display-name>Fad2.0</display-name>
     <servlet>
         <servlet-name>Print</servlet-name>
-        <servlet-class>it.refill.servlet.Print</servlet-class>
+        <servlet-class>rc.so.servlet.Print</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>Login</servlet-name>
-        <servlet-class>it.refill.servlet.Login</servlet-class>
+        <servlet-class>rc.so.servlet.Login</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>Mail</servlet-name>
-        <servlet-class>it.refill.servlet.Mail</servlet-class>
+        <servlet-class>rc.so.servlet.Mail</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>Mail_Docenti</servlet-name>
-        <servlet-class>it.refill.servlet.Mail_Docenti</servlet-class>
+        <servlet-class>rc.so.servlet.Mail_Docenti</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>MailConference</servlet-name>
-        <servlet-class>it.refill.servlet.MailConference</servlet-class>
+        <servlet-class>rc.so.servlet.MailConference</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>Print</servlet-name>

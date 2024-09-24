@@ -3,12 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package it.refill.engine;
+package rc.so.engine;
 
 import com.google.gson.Gson;
-import static it.refill.engine.Action.conf;
-import static it.refill.engine.Action.estraiEccezione;
-import static it.refill.engine.Action.pat_5;
+import static rc.so.engine.Action.conf;
+import static rc.so.engine.Action.estraiEccezione;
+import static rc.so.engine.Action.pat_5;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;

@@ -3,14 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package it.refill.servlet;
+package rc.so.servlet;
 
-import it.refill.engine.Action;
-import static it.refill.engine.Action.getRequestValue;
-import static it.refill.engine.Action.log;
-import static it.refill.engine.Action.pat_1;
-import it.refill.engine.GenericUser;
-import static it.refill.servlet.Mail.fadmail_docente;
+import rc.so.engine.Action;
+import static rc.so.engine.Action.getRequestValue;
+import static rc.so.engine.Action.log;
+import static rc.so.engine.Action.pat_1;
+import rc.so.engine.GenericUser;
+import static rc.so.servlet.Mail.fadmail_docente;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
